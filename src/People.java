@@ -37,12 +37,25 @@ public class People {
         Spark.get(
                 "/",
                 ((request, response) -> {
-                    ArrayList<Person> peeps = new ArrayList<>(people);
+                    String offset = request.queryParams("offset");
 
-                    peeps = new ArrayList(peeps.subList(0, 20));
+                    int namesStart;
+
+                    if (offset == null) {
+                        namesStart = 0;
+                    } else {
+                        namesStart = Integer.valueOf(offset);
+                    }
+
+                    if(!(namesStart<people.size())) {
+                        Spark.halt(403);
+                    }
+
+                    ArrayList<Person> peeps = new ArrayList<Person>(people.subList(namesStart, namesStart + 20));
 
                     HashMap m = new HashMap();
                     m.put("people", peeps);
+                    m.put("offset", namesStart + 20);
 
                     return new ModelAndView(m, "people.html");
                 }),
