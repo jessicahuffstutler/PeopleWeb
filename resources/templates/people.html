@@ -1,7 +1,7 @@
 <html>
 <body>
 {{#people}}
-{{firstName}} {{lastName}} <br>
+<a href="/person?id={{id}}">{{firstName}} {{lastName}}</a> <br>
 {{/people}}
 <a href="/?offset={{offset}}">Next</a>
 </form>

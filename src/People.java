@@ -61,6 +61,21 @@ public class People {
                 }),
                 new MustacheTemplateEngine()
         );
+
+        Spark.get(
+                "/person",
+                ((request, response) -> {
+                    HashMap m = new HashMap();
+
+                    String id = request.queryParams("id");
+                    int idNum = Integer.valueOf(id);
+                    Person person = people.get(idNum -1);
+                    m.put("person", person);
+
+                    return new ModelAndView(m, "person.html");
+                }),
+                new MustacheTemplateEngine()
+        );
     }
 
     static String readFile(String fileName) {
