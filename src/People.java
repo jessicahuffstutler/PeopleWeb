@@ -38,8 +38,12 @@ public class People {
                 "/",
                 ((request, response) -> {
                     ArrayList<Person> peeps = new ArrayList<>(people);
+
+                    peeps = new ArrayList(peeps.subList(0, 20));
+
                     HashMap m = new HashMap();
                     m.put("people", peeps);
+
                     return new ModelAndView(m, "people.html");
                 }),
                 new MustacheTemplateEngine()
