@@ -1,6 +1,11 @@
+import spark.ModelAndView;
+import spark.Spark;
+import spark.template.mustache.MustacheTemplateEngine;
+
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by zach on 10/19/15.
@@ -13,15 +18,32 @@ public class People {
         String[] lines = fileContent.split("\n");
 
         for (String line : lines) {
-            if (line == lines[0])
+            if (line == lines[0]) {
                 continue;
+            }
 
             String[] columns = line.split(",");
-            Person person = new Person(Integer.valueOf(columns[0]), columns[1], columns[2], columns[3], columns[4], columns[5]);
+            String firstName = columns[1];
+            String lastName = columns[2];
+            String email = columns[3];
+            String country = columns[4];
+            String ipAddress = columns[5];
+            Person person = new Person(Integer.valueOf(columns[0]), firstName, lastName, email, country, ipAddress);
             people.add(person);
         }
 
-        // write Spark route here
+
+
+        Spark.get(
+                "/",
+                ((request, response) -> {
+                    ArrayList<Person> peeps = new ArrayList<>(people);
+                    HashMap m = new HashMap();
+                    m.put("people", peeps);
+                    return new ModelAndView(m, "people.html");
+                }),
+                new MustacheTemplateEngine()
+        );
     }
 
     static String readFile(String fileName) {
