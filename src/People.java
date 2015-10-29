@@ -11,11 +11,15 @@ import java.util.HashMap;
  * Created by zach on 10/19/15.
  */
 public class People {
+
+    static final int SHOW_COUNT = 20;
+
     public static void main(String[] args) {
         ArrayList<Person> people = new ArrayList();
 
         String fileContent = readFile("people.csv");
         String[] lines = fileContent.split("\n");
+
 
         for (String line : lines) {
             if (line == lines[0]) {
@@ -32,17 +36,15 @@ public class People {
             people.add(person);
         }
 
-
-
         Spark.get(
                 "/",
                 ((request, response) -> {
-                    String offset = request.queryParams("offset");
+                    String offset = request.queryParams("offset"); //getting a query parameter equal to 20, first time we go to the site it will be null
 
                     int namesStart;
 
                     if (offset == null) {
-                        namesStart = 0;
+                        namesStart = 0; //if it's null, like we know it will be from above, give it a default offset number of 0
                     } else {
                         namesStart = Integer.valueOf(offset);
                     }
@@ -51,11 +53,17 @@ public class People {
                         Spark.halt(403);
                     }
 
-                    ArrayList<Person> peeps = new ArrayList<Person>(people.subList(namesStart, namesStart + 20));
+                    ArrayList<Person> peeps = new ArrayList<Person>(people.subList(namesStart, namesStart + SHOW_COUNT));
+                    //ArrayList<Person> peeps = new ArrayList<Person>(people.subList(Math.min(people.size(), namesStart, Math.min(people.size(), namesStart + 20));
+                    //this will eliminate an error if "http://localhost:4567/?offset=990" this is entered into the URL or if we go over people.size();
+                    //this could replace the if(!(namesStart<people.size())) {Spark.halt(403);} above.
 
                     HashMap m = new HashMap();
-                    m.put("people", peeps);
-                    m.put("offset", namesStart + 20);
+                    m.put("people", peeps); //pass ArrayList: peeps into the hashmap to show in the html where we call "people"
+                    m.put("newOffset", namesStart + SHOW_COUNT); //"newOffset" calls {{newOffset}} from people.html
+
+                    boolean showNext = namesStart + SHOW_COUNT < people.size();
+                    m.put("showNext", showNext); //will stop showing the "next" button when there will be no more names to display on another page
 
                     return new ModelAndView(m, "people.html");
                 }),
