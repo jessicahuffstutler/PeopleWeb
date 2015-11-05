@@ -9,8 +9,11 @@ public class Person implements Comparable {
     String country;
     String ip;
 
-    public Person(int id, String firstName, String lastName, String email, String country, String ip) {
-        this.id = id;
+    public Person() {
+
+    }
+
+    public Person(String firstName, String lastName, String email, String country, String ip) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
